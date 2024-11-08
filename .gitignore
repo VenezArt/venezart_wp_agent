@@ -129,6 +129,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+agent/.env
+coromoto/.env
+
 
 # Spyder project settings
 .spyderproject
