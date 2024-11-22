@@ -38,7 +38,7 @@ headers = {
 # Other functions...
 
 def generate_post_topic():
-    topics = ["entrepreneurship", "art", "tech"]
+    topics = ["entrepreneurship", "entrepreneurship news","entrepreneurship actionable guides to starting, managing and scaling business","entrepreneurship life style","entrepreneurship mind, body and health", "art","art news covering the latest trends in the art world, including emerging artists, art styles, and groundbreaking projects","art tutorials providing step-by-step guides on various artistic techniques, digital tools, or creative projects", "art industry insights, discuss the art industry chanllenges, innovations and market trends in self publishing comicbooks, graphic novels, gaming, animation and cinematography", "tech", "tech news highlighting breakthroughs in tech, from AI advancements to new gadgets","tech tutorials guides that simplify complex tech concepts or explain how to use specific tools", "tech industry insights, analysing the implementation of tech trends and development" ]
     topic = random.choice(topics)
     logger.info(f"Selected random topic: {topic}")
     return topic
@@ -89,6 +89,9 @@ def gpt_generate_v_post(post_topic):
                 "content": (
                     f"Create an engaging post on {post_topic} with a title and content. "
                     f"The title should be catchy, between 8-12 words, and suitable for a blog post. "
+                    f"The content should have a professional yet conversational tone to keep readers engaged. "
+                    f"The content should be structured, using subheadings, bullet points, and short paragraphs for readability. "
+                    f"The content should have citations links to credible sources when referencing data and news. "
                     f"The content should be under 500 words and include relevant hashtags and SEO keywords."
                     f"don't include the word Title in the title."
                 ),
