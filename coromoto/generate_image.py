@@ -79,7 +79,7 @@ def upload_image_to_wordpress(image_path):
 
 def generate_image(topic):
     print(f"Generating image for topic: {topic}")
-    model_id = "stabilityai/stable-diffusion-2-1"
+    model_id = "nitrosocke/redshift-diffusion"
     print(f"Loading model: {model_id}")
 
     if not torch.cuda.is_available():
@@ -95,22 +95,22 @@ def generate_image(topic):
         return None
 
     num_inference_steps = 25
-    guidance_scale = 10.0
+    guidance_scale = 10
 
     # Updated prompts for each topic
     prompts = {
         "entrepreneurship": (
-            "A hyper-realistic 3D render of a skyscraper rooftop at dusk, overlooking a cityscape with glowing lights. "
-            "Deep blues, warm oranges, and metallic tones give the city a vibrant, dynamic look. Photorealistic style "
+            "Western comic book art style, full shot, hero stands, cinematic, vector, inked lines"
+            "vibrant colors, halftone shading, panel layout, action, movement"
             "with cinematic lighting and depth, conveying ambition, innovation, and growth."
         ),
         "art": (
-            "A surreal and colorful abstract painting with vibrant swirls, bold geometric shapes, and dynamic brushstrokes. "
-            "The composition bursts with energy, blending warm and cool tones, and creates a mesmerizing scene that invites "
-            "viewers to explore creativity and imagination. Artistic, expressive, and captivating."
+            "Western comic book art style, full shot, cinematic, vector, inked lines"
+            ""vibrant colors, halftone shading, panel layout, action, movement and creates a mesmerizing scene that invites "
+            "viewers to explore creativity and imagination, with cinematic lighting and depth, conveying action and movement."
         ),
         "tech": (
-            "A futuristic high-tech lab interior filled with holographic screens, robotic arms, and cutting-edge machinery. "
+            "Western comic book art style, cyberpunk, hero stands, cinematic, vector, inked lines"
             "Cool blue and neon lights illuminate the room, casting a sleek and modern ambiance. Digital schematics and "
             "AI interfaces are displayed, capturing the innovation and possibilities of advanced technology."
         ),
