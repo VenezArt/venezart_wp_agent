@@ -79,7 +79,7 @@ def upload_image_to_wordpress(image_path):
 
 def generate_image(topic):
     print(f"Generating image for topic: {topic}")
-    model_id = "stabilityai/stable-diffusion-2-1"
+    model_id = "waifu-diffusion"
     print(f"Loading model: {model_id}")
 
     if not torch.cuda.is_available():
@@ -100,18 +100,18 @@ def generate_image(topic):
     # Updated prompts for each topic
     prompts = {
         "entrepreneurship": (
-            "A hyper-realistic 3D render of a skyscraper rooftop at dusk, overlooking a cityscape with glowing lights. "
-            "Deep blues, warm oranges, and metallic tones give the city a vibrant, dynamic look. Photorealistic style "
+            "A comic book-style image reflecting title's subject, hero stand, full shot, jim lee "
+            "vibrant colors, halftone shading, panel layout, inked lines"
             "with cinematic lighting and depth, conveying ambition, innovation, and growth."
         ),
         "art": (
-            "A surreal and colorful abstract painting with vibrant swirls, bold geometric shapes, and dynamic brushstrokes. "
-            "The composition bursts with energy, blending warm and cool tones, and creates a mesmerizing scene that invites "
+            "A comic book-style image reflecting title's subject, hero stand, full shot, jim lee "
+            "The composition bursts with energy, blending warm and cool tones, and creates a mesmerizing scene that invites, vibrant colors, halftone shading, panel layout, inked lines"
             "viewers to explore creativity and imagination. Artistic, expressive, and captivating."
         ),
         "tech": (
-            "A futuristic high-tech lab interior filled with holographic screens, robotic arms, and cutting-edge machinery. "
-            "Cool blue and neon lights illuminate the room, casting a sleek and modern ambiance. Digital schematics and "
+            "A comic book-style image reflecting title's subject, hero stand, full shot, jim lee "
+            "Cool blue and neon lights illuminate the room, casting a sleek and modern ambiance. Digital schematics cyberpink genre "
             "AI interfaces are displayed, capturing the innovation and possibilities of advanced technology."
         ),
     }
