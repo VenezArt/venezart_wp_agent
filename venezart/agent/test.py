@@ -4,15 +4,14 @@ import time
 import os
 import logging
 import random
-<<<<<<< HEAD
-=======
-# import ollama
->>>>>>> 03c9e92a20a9522ecf8ae4567d9b2eb058bbab5a
+import ollama
 import base64
 import requests
 from dotenv import load_dotenv
 from authenticate import open_ai_auth
 from generate_image import generate_image, upload_image_to_wordpress  # Import the image generation function
+from image_generator import generate_image
+
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -41,7 +40,7 @@ headers = {
 # Other functions...
 
 def generate_post_topic():
-    topics = ["entrepreneurship", "entrepreneurship news","entrepreneurship actionable guides to starting, managing and scaling business","entrepreneurship life style","entrepreneurship mind, body and health", "art","art news covering the latest trends in the art world, including emerging artists, art styles, and groundbreaking projects","art tutorials providing step-by-step guides on various artistic techniques, digital tools, or creative projects", "art industry insights, discuss the art industry chanllenges, innovations and market trends in self publishing comicbooks, graphic novels, gaming, animation and cinematography", "tech", "tech news highlighting breakthroughs in tech, from AI advancements to new gadgets","tech tutorials guides that simplify complex tech concepts or explain how to use specific tools", "tech industry insights, analysing the implementation of tech trends and development" ]
+    topics = ["entrepreneurship", "art", "tech"]
     topic = random.choice(topics)
     logger.info(f"Selected random topic: {topic}")
     return topic
@@ -92,9 +91,6 @@ def gpt_generate_v_post(post_topic):
                 "content": (
                     f"Create an engaging post on {post_topic} with a title and content. "
                     f"The title should be catchy, between 8-12 words, and suitable for a blog post. "
-                    f"The content should have a professional yet conversational tone to keep readers engaged. "
-                    f"The content should be structured, using subheadings, bullet points, and short paragraphs for readability. "
-                    f"The content should have citations links to credible sources when referencing data and news. "
                     f"The content should be under 500 words and include relevant hashtags and SEO keywords."
                     f"don't include the word Title in the title."
                 ),
@@ -176,6 +172,6 @@ if __name__ == "__main__":
     while True:
         main()  # Run the main function to generate and post content
         # Generate a random sleep time between 12 and 24 hours
-        sleep_time = random.uniform(1 * 3600, 2 * 3600)  # Convert hours to seconds
+        sleep_time = random.uniform(12 * 3600, 24 * 3600)  # Convert hours to seconds
         logger.info(f"Sleeping for {sleep_time / 3600:.2f} hours until the next post...")
         time.sleep(sleep_time)
