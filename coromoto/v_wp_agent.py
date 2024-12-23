@@ -4,7 +4,6 @@ import time
 import os
 import logging
 import random
-import ollama
 import base64
 import requests
 from dotenv import load_dotenv
