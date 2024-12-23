@@ -4,7 +4,7 @@ import time
 import os
 import logging
 import random
-# import ollama
+import ollama
 import base64
 import requests
 from dotenv import load_dotenv
@@ -38,7 +38,20 @@ headers = {
 # Other functions...
 
 def generate_post_topic():
-    topics = ["entrepreneurship", "entrepreneurship news","entrepreneurship actionable guides to starting, managing and scaling business","entrepreneurship life style","entrepreneurship mind, body and health", "art","art news covering the latest trends in the art world, including emerging artists, art styles, and groundbreaking projects","art tutorials providing step-by-step guides on various artistic techniques, digital tools, or creative projects", "art industry insights, discuss the art industry chanllenges, innovations and market trends in self publishing comicbooks, graphic novels, gaming, animation and cinematography", "tech", "tech news highlighting breakthroughs in tech, from AI advancements to new gadgets","tech tutorials guides that simplify complex tech concepts or explain how to use specific tools", "tech industry insights, analysing the implementation of tech trends and development" ]
+    topics = [
+        "startup culture", "bootstrapping vs. venture funding", "growth hacking techniques",
+        "business planning and strategy", "risk management in startups", "entrepreneurial mindset and mental health",
+        "effective networking strategies", "product-market fit", "leadership in startups", 
+        "building effective teams", "social entrepreneurship", "overcoming challenges as a founder",
+        "digital art trends", "the impact of AI in art", "mixed media techniques", 
+        "history of abstract art", "surrealism explained", "exploring street art", "art therapy techniques", 
+        "NFT art market", "traditional vs. digital art", "art movements of the 20th century", 
+        "portrait drawing techniques", "sculpting and its significance",
+        "blockchain beyond cryptocurrency", "AI and machine learning in everyday life", "virtual reality trends",
+        "the future of quantum computing", "emerging programming languages", "ethical concerns in AI development",
+        "advances in renewable tech", "internet of things (IoT) innovations", "cloud computing vs. edge computing",
+        "the rise of 5G and its impacts", "cybersecurity threats and best practices", "tech for social good"
+    ]
     topic = random.choice(topics)
     logger.info(f"Selected random topic: {topic}")
     return topic
@@ -78,41 +91,58 @@ def get_tag_ids(slugs):
 
 
 
+import logging
+import random
+
+logger = logging.getLogger(__name__)
+
 def gpt_generate_v_post(post_topic):
     logger.info(f"Generating a post based on the following topic using ChatGPT API: {post_topic}...")
-    response = ai_client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a helpful writing assistant."},
-            {
-                "role": "user",
-                "content": (
-                    f"Create an engaging post on {post_topic} with a title and content. "
-                    f"The title should be catchy, between 8-12 words, and suitable for a blog post. "
-                    f"The content should have a professional yet conversational tone to keep readers engaged. "
-                    f"The content should be structured, using subheadings, bullet points, and short paragraphs for readability. "
-                    f"The content should have citations links to credible sources when referencing data and news. "
-                    f"The content should be under 500 words and include relevant hashtags and SEO keywords."
-                    f"don't include the word Title in the title."
-                ),
-            },
-        ],
-    )
-    full_content = response.choices[0].message.content.strip()
-    lines = full_content.splitlines()
     
-    # Extract the title and ensure it does not contain "Title:" prefix
-    title = lines[0].strip() if lines else f"{post_topic.capitalize()} Insights"
+    try:
+        response = ai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful writing assistant."},
+                {
+                    "role": "user",
+                    "content": (
+                        f"Create an engaging post on {post_topic} with a title and content. "
+                        f"The title should be catchy, between 8-12 words, and suitable for a blog post. "
+                        f"The content should be under 500 words and include relevant hashtags and SEO keywords. "
+                        f"Do not include the word 'Title' in the title."
+                    ),
+                },
+            ],
+        )
+        
+        full_content = response.choices[0].message.content.strip()
+        lines = full_content.splitlines()
+        
+        # Extract the title from the first non-empty line, without a "Title:" prefix.
+        title = None
+        for line in lines:
+            line = line.strip()
+            if line and not line.lower().startswith("title:"):
+                title = line.lstrip("*").strip()  # Remove any asterisks or leading/trailing spaces
+                break
+        
+        if not title:
+            title = f"{post_topic.capitalize()} Insights"  # Fallback title if none detected
 
-     # Ensure the title is clean and formatted properly
-    title = title.lstrip("*").strip()  # Remove any asterisks and leading/trailing spaces
-            
-    # Extract content after the title
-    content = "\n".join(lines[1:]) if len(lines) > 1 else full_content
+        # Extract the content after the title
+        content_start_index = lines.index(title) + 1 if title in lines else 1
+        content = "\n".join(lines[content_start_index:]).strip()
 
-    logger.info(f"Generated Post - Title: {title}")
-    logger.info(f"Content: {content}")
-    return title, content
+        logger.info(f"Generated Post - Title: {title}")
+        logger.info(f"Content: {content}")
+        
+        return title, content
+
+    except Exception as e:
+        logger.error(f"Failed to generate post: {str(e)}")
+        return None, None
+
 
 def create_wordpress_post(title, content, category_ids, tag_ids, featured_image_id=None):
     """ Create a WordPress post with tags, categories, and optionally an image """
@@ -173,6 +203,6 @@ if __name__ == "__main__":
     while True:
         main()  # Run the main function to generate and post content
         # Generate a random sleep time between 12 and 24 hours
-        sleep_time = random.uniform(1 * 3600, 2 * 3600)  # Convert hours to seconds
+        sleep_time = random.uniform(12 * 3600, 24 * 3600)  # Convert hours to seconds
         logger.info(f"Sleeping for {sleep_time / 3600:.2f} hours until the next post...")
         time.sleep(sleep_time)
