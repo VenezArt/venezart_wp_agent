@@ -38,18 +38,11 @@ def generate_topic():
             
     
     topics = [
-        "startup culture", "bootstrapping vs. venture funding", "growth hacking techniques",
-        "business planning and strategy", "risk management in startups", "entrepreneurial mindset and mental health",
-        "effective networking strategies", "product-market fit", "leadership in startups", 
-        "building effective teams", "social entrepreneurship", "overcoming challenges as a founder",
-        "digital art trends", "the impact of AI in art", "mixed media techniques", 
-        "history of abstract art", "surrealism explained", "exploring street art", "art therapy techniques", 
-        "NFT art market", "traditional vs. digital art", "art movements of the 20th century", 
-        "portrait drawing techniques", "sculpting and its significance",
-        "blockchain beyond cryptocurrency", "AI and machine learning in everyday life", "virtual reality trends",
-        "the future of quantum computing", "emerging programming languages", "ethical concerns in AI development",
-        "advances in renewable tech", "internet of things (IoT) innovations", "cloud computing vs. edge computing",
-        "the rise of 5G and its impacts", "cybersecurity threats and best practices", "tech for social good"
+       "Entrepreneurshit", "Startup Culture", "indie development studio Bootstrapping techniques"
+"Art","Digital art trend", "traditional art trend", "Comic book illutration trends", "Inking tips and tricks"
+"Technology updates", "AI trends","NVIDIA updates and News", "Unreal Engine Updates and News","Indie Game development News", 
+"AI and traditional art", "generative Ai news and updates","comic book culture", "Grafitti culture", 
+"Heavy Metal Magazine Culture", "SciFi", "Cinematis and VFXs","Street Art"
     ]
 
     topic = random.choice(topics)

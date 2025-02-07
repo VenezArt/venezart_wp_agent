@@ -1,0 +1,7 @@
+requests
+python-dotenv
+openai
+torch
+diffusers
+pandas
+nltk 

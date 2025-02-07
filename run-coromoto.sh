@@ -22,7 +22,7 @@ while true; do
 
         # Array of Python script paths (replace with the actual paths to your scripts)
         PYTHON_SCRIPTS=(
-            "./coromoto/v_wp_agent.py"
+            "./venezart/wp_news/agent_news_wp_venezart.py"
             
         )
 

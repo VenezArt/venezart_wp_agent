@@ -4,15 +4,11 @@ import time
 import os
 import logging
 import random
-<<<<<<< HEAD
-=======
-# import ollama
->>>>>>> 03c9e92a20a9522ecf8ae4567d9b2eb058bbab5a
 import base64
 import requests
 from dotenv import load_dotenv
 from authenticate import open_ai_auth
-from generate_image import generate_image, upload_image_to_wordpress  # Import the image generation function
+# from generate_image import generate_image, upload_image_to_wordpress  # Import the image generation function
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -117,19 +113,17 @@ def gpt_generate_v_post(post_topic):
     logger.info(f"Content: {content}")
     return title, content
 
-def create_wordpress_post(title, content, category_ids, tag_ids, featured_image_id=None):
+def create_wordpress_post(title, content, category_ids, tag_ids):
     """ Create a WordPress post with tags, categories, and optionally an image """
     post_data = {
         "title": title,
         "content": content,
-        "status": "publish",
+        "status": "drafts",
         "categories": category_ids,
         "tags": tag_ids
     }
 
     # Add featured image if available
-    if featured_image_id:
-        post_data["featured_media"] = featured_image_id
 
     try:
         response = requests.post(f"{wordpress_url}/posts", json=post_data, headers=headers)
@@ -163,13 +157,13 @@ def main():
             post_content = f"<img src='{existing_image_url}' alt='{topic}' />\n\n" + post_content
         elif enable_image_generation:
             # If no existing image is found, generate a new one
-            image_path = generate_image(topic)  # Generate image based on the topic
-            image_url, image_id = upload_image_to_wordpress(image_path)
+            # image_path = generate_image(topic)  # Generate image based on the topic
+            # image_url, image_id = upload_image_to_wordpress(image_path)
 
             # if image_url:
             #     post_content = f"<img src='{image_url}' alt='{topic}' />\n\n" + post_content
 
-        create_wordpress_post(post_title, post_content, [topic_category_id, just_release_category_id], tag_ids, image_id)
+            create_wordpress_post(post_title, post_content, [topic_category_id, just_release_category_id], tag_ids)
 
 # Adding a loop to run continuously
 if __name__ == "__main__":

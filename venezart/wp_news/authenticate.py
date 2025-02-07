@@ -1,4 +1,4 @@
-import tweepy
+
 import os
 import logging
 import openai
