@@ -1,0 +1,179 @@
+import time
+
+# Import the necessary modules (the rest of your script remains unchanged)
+import os
+import logging
+import random
+import base64
+import requests
+from dotenv import load_dotenv
+from authenticate import open_ai_auth
+# from generate_image import generate_image, upload_image_to_wordpress  # Import the image generation function
+
+# Configure logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Load environment variables from a .env file
+load_dotenv()
+
+# Environment variables
+wordpress_url = os.getenv("WORDPRESS_URL")
+username = os.getenv("WORDPRESS_USERNAME")
+password = os.getenv("WORDPRESS_PASSWORD")
+
+ai_client = open_ai_auth()
+
+# Prepare the credentials for Basic Auth
+auth_string = f"{username}:{password}"
+encoded_auth = base64.b64encode(auth_string.encode()).decode()
+
+# Headers with encoded authorization
+headers = {
+    "Authorization": f"Basic {encoded_auth}",
+    "Content-Type": "application/json"
+}
+
+# Other functions...
+
+def generate_post_topic():
+    topics = ["Traditional Art tutorials", "Computer Generated Imagery and digital art tutorials", "Prompt generated imagery tutorials", "Pencil Drawing tutorials", "Comic book drawing tutorials", "Game Art Tutorials" ]
+    topic = random.choice(topics)
+    logger.info(f"Selected random topic: {topic}")
+    return topic
+
+def get_category_id(slug):
+    """ Get category ID by slug """
+    category_response = requests.get(f"{wordpress_url}/categories?slug={slug}", headers=headers)
+    if category_response.status_code == 200:
+        categories = category_response.json()
+        if categories:
+            category_id = categories[0]["id"]
+            logger.info(f"Category ID for '{slug}': {category_id}")
+            return category_id
+        else:
+            logger.error(f"Category with slug '{slug}' not found.")
+    else:
+        logger.error("Failed to retrieve categories:", category_response.status_code, category_response.text)
+    return None
+
+
+def get_tag_ids(slugs):
+    """ Get tag IDs by slugs """
+    tag_ids = []
+    for slug in slugs:
+        tag_response = requests.get(f"{wordpress_url}/tags?slug={slug}", headers=headers)
+        if tag_response.status_code == 200:
+            tags = tag_response.json()
+            if tags:
+                tag_id = tags[0]["id"]
+                tag_ids.append(tag_id)
+                logger.info(f"Tag ID for '{slug}': {tag_id}")
+            else:
+                logger.error(f"Tag with slug '{slug}' not found.")
+        else:
+            logger.error(f"Failed to retrieve tag '{slug}': {tag_response.status_code}, {tag_response.text}")
+    return tag_ids
+
+
+
+def gpt_generate_v_post(post_topic):
+    logger.info(f"Generating a post based on the following topic using ChatGPT API: {post_topic}...")
+    response = ai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a helpful writing assistant."},
+            {
+                "role": "user",
+                "content": (
+                    f"Create an engaging post on {post_topic} with a title and content. "
+                    f"The title should be catchy, between 8-12 words, and suitable for a blog post. "
+                    f"The content should have a professional yet conversational tone to keep readers engaged. "
+                    f"A Clear Topic Define what the tutorial is about."
+                    f"Step by step breakdown."
+                    f"Consisting formatiing, introduction, materials needed, tips and commond mistakes, conclusion."
+                    f"A cohesive style."
+                    f"The content should be structured, using subheadings, bullet points, and short paragraphs for readability. "
+                    f"The content should have citations links to credible sources when referencing data and news. "
+                    f"The content should be under 1500 words and include relevant hashtags and SEO keywords."
+                    f"don't include the word Title in the title."
+                ),
+            },
+        ],
+    )
+    full_content = response.choices[0].message.content.strip()
+    lines = full_content.splitlines()
+    
+    # Extract the title and ensure it does not contain "Title:" prefix
+    title = lines[0].strip() if lines else f"{post_topic.capitalize()} Insights"
+
+     # Ensure the title is clean and formatted properly
+    title = title.lstrip("*").strip()  # Remove any asterisks and leading/trailing spaces
+            
+    # Extract content after the title
+    content = "\n".join(lines[1:]) if len(lines) > 1 else full_content
+
+    logger.info(f"Generated Post - Title: {title}")
+    logger.info(f"Content: {content}")
+    return title, content
+
+def create_wordpress_post(title, content, category_ids, tag_ids):
+    """ Create a WordPress post with tags, categories, and optionally an image """
+    post_data = {
+        "title": title,
+        "content": content,
+        "status": "draft",
+        "categories": category_ids,
+        "tags": tag_ids
+    }
+
+    # Add featured image if available
+
+    try:
+        response = requests.post(f"{wordpress_url}/posts", json=post_data, headers=headers)
+        if response.status_code == 201:
+            logger.info("Post created successfully: " + response.json().get("link"))
+        else:
+            logger.error(f"Failed to create post: {response.status_code}, {response.text}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"An error occurred while creating the post: {e}")
+
+# Main function to generate and create a WordPress post
+def main():
+    # Toggle for enabling or disabling image generation and upload
+    enable_image_generation = os.getenv("ENABLE_IMAGE_GENERATION", "true").lower() == "true"
+
+    topic = generate_post_topic()
+    topic_category_id = get_category_id(topic)
+    just_release_category_id = get_category_id("just-release")
+
+    # Adding tags to match the previous post
+    tag_ids = get_tag_ids(["art", "blog", "just-release", "post", "creativity", "engagement"])
+
+    if topic_category_id and just_release_category_id:
+        post_title, post_content = gpt_generate_v_post(topic)
+
+        # Try to get an existing image
+        existing_image_url = None
+
+        if existing_image_url:
+            # If the image is found, use it
+            post_content = f"<img src='{existing_image_url}' alt='{topic}' />\n\n" + post_content
+        elif enable_image_generation:
+            # If no existing image is found, generate a new one
+            # image_path = generate_image(topic)  # Generate image based on the topic
+            # image_url, image_id = upload_image_to_wordpress(image_path)
+
+            # if image_url:
+            #     post_content = f"<img src='{image_url}' alt='{topic}' />\n\n" + post_content
+
+            create_wordpress_post(post_title, post_content, [topic_category_id, just_release_category_id], tag_ids)
+
+# Adding a loop to run continuously
+if __name__ == "__main__":
+    while True:
+        main()  # Run the main function to generate and post content
+        # Generate a random sleep time between 12 and 24 hours
+        sleep_time = random.uniform(1 * 3600, 2 * 3600)  # Convert hours to seconds
+        logger.info(f"Sleeping for {sleep_time / 3600:.2f} hours until the next post...")
+        time.sleep(sleep_time)
